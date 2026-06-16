@@ -119,7 +119,7 @@ export default function App() {
 
       {/* ── MOBILE BOTTOM TAB BAR (calculator mode only) ── */}
       {mode === 'calculator' && (
-        <nav className="md:hidden flex-shrink-0 border-t border-white/8 flex" style={{ background: '#0a1322' }}>
+        <nav className="md:hidden flex-shrink-0 border-t-2 border-white/10 flex" style={{ background: '#0a1322', paddingBottom: 'env(safe-area-inset-bottom)' }}>
           {[
             { id: 'patient', label: 'Patient',  icon: '🧑‍⚕️' },
             { id: 'drugs',   label: 'Drugs',    icon: '💊' },
@@ -127,14 +127,15 @@ export default function App() {
             <button
               key={t.id}
               onClick={() => setMobileTab(t.id)}
-              className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-semibold transition-all ${
+              style={{ minHeight: 64 }}
+              className={`flex-1 flex flex-col items-center justify-center gap-1.5 py-4 font-semibold transition-all active:opacity-70 ${
                 mobileTab === t.id
-                  ? 'text-blue-400 border-t-2 border-blue-500'
-                  : 'text-white/30 border-t-2 border-transparent'
+                  ? 'text-blue-400 border-t-2 border-blue-500 -mt-0.5'
+                  : 'text-white/35 border-t-2 border-transparent -mt-0.5'
               }`}
             >
-              <span className="text-lg leading-none">{t.icon}</span>
-              <span>{t.label}</span>
+              <span className="text-2xl leading-none">{t.icon}</span>
+              <span className="text-sm">{t.label}</span>
             </button>
           ))}
         </nav>
