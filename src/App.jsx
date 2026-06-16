@@ -29,10 +29,10 @@ export default function App() {
         <div className="flex items-center gap-2 flex-shrink-0">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xs flex-shrink-0">💉</div>
           <div className="hidden sm:block">
-            <p className="text-sm font-bold text-white leading-none">Thai Anesthetic Drug</p>
+            <p className="text-sm font-bold text-white leading-none">Anesthetic Drug Calculator</p>
             <p className="text-[10px] text-white/30 mt-0.5">Drug calculator &amp; reference</p>
           </div>
-          <p className="text-xs font-bold text-white sm:hidden">Thai Anesthetic</p>
+          <p className="text-xs font-bold text-white sm:hidden">Anesthetic Calc</p>
         </div>
 
         <div className="flex-1" />
