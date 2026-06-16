@@ -20,7 +20,7 @@ export default function App() {
   const categoryList = source === 'barash' ? BARASH_CATS  : MILLERS_CATS;
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden" style={{ background: '#080f1e' }}>
+    <div className="flex flex-col overflow-hidden" style={{ background: '#080f1e', height: '100dvh' }}>
 
       {/* ── HEADER ── */}
       <header className="flex-shrink-0 border-b border-white/8 px-3 md:px-5 py-2.5 md:py-3 flex items-center gap-2 md:gap-4" style={{ background: '#0a1322' }}>
