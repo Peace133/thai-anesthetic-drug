@@ -20,7 +20,7 @@ export default function App() {
   const categoryList = source === 'barash' ? BARASH_CATS  : MILLERS_CATS;
 
   return (
-    <div className="flex flex-col overflow-hidden" style={{ background: '#080f1e', height: '100dvh' }}>
+    <div className="flex flex-col" style={{ background: '#080f1e', minHeight: '100dvh' }}>
 
       {/* ── HEADER ── */}
       <header className="flex-shrink-0 border-b border-white/8 px-3 md:px-5 py-2.5 md:py-3 flex items-center gap-2 md:gap-4" style={{ background: '#0a1322' }}>
@@ -86,7 +86,7 @@ export default function App() {
       </div>
 
       {/* ── CONTENT ── */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden" style={{ paddingBottom: mode === 'calculator' ? 64 : 0 }}>
 
         {/* ── CALCULATOR MODE ── */}
         {mode === 'calculator' && (
@@ -119,7 +119,7 @@ export default function App() {
 
       {/* ── MOBILE BOTTOM TAB BAR (calculator mode only) ── */}
       {mode === 'calculator' && (
-        <nav className="md:hidden flex-shrink-0 border-t-2 border-white/10 flex" style={{ background: '#0a1322', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t-2 border-white/10 flex" style={{ background: '#0a1322', paddingBottom: 'env(safe-area-inset-bottom)' }}>
           {[
             { id: 'patient', label: 'Patient',  icon: '🧑‍⚕️' },
             { id: 'drugs',   label: 'Drugs',    icon: '💊' },
