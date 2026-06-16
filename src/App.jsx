@@ -11,9 +11,10 @@ const DEFAULT_PATIENT = {
 };
 
 export default function App() {
-  const [source, setSource]   = useState('millers');
-  const [mode, setMode]       = useState('calculator');
-  const [patient, setPatient] = useState(DEFAULT_PATIENT);
+  const [source, setSource]     = useState('millers');
+  const [mode, setMode]         = useState('calculator');
+  const [patient, setPatient]   = useState(DEFAULT_PATIENT);
+  const [mobileTab, setMobileTab] = useState('drugs'); // 'patient' | 'drugs'
 
   const drugList     = source === 'barash' ? BARASH_DRUGS : MILLERS_DRUGS;
   const categoryList = source === 'barash' ? BARASH_CATS  : MILLERS_CATS;
@@ -22,20 +23,22 @@ export default function App() {
     <div className="min-h-screen flex flex-col" style={{ background: '#080f1e' }}>
 
       {/* ── HEADER ── */}
-      <header className="flex-shrink-0 border-b border-white/8 px-5 py-3 flex items-center gap-4" style={{ background: '#0a1322' }}>
+      <header className="flex-shrink-0 border-b border-white/8 px-3 md:px-5 py-2.5 md:py-3 flex items-center gap-2 md:gap-4" style={{ background: '#0a1322' }}>
+
         {/* Logo */}
-        <div className="flex items-center gap-2.5 flex-shrink-0">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xs">💉</div>
-          <div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xs flex-shrink-0">💉</div>
+          <div className="hidden sm:block">
             <p className="text-sm font-bold text-white leading-none">Thai Anesthetic Drug</p>
             <p className="text-[10px] text-white/30 mt-0.5">Drug calculator &amp; reference</p>
           </div>
+          <p className="text-xs font-bold text-white sm:hidden">Thai Anesthetic</p>
         </div>
 
         <div className="flex-1" />
 
         {/* Source toggle */}
-        <div className="flex items-center gap-1 bg-white/5 rounded-lg p-1 border border-white/8">
+        <div className="flex items-center gap-0.5 bg-white/5 rounded-lg p-1 border border-white/8">
           {[
             { id: 'millers', label: "Miller's", icon: '📗' },
             { id: 'barash',  label: 'Barash',   icon: '📘' },
@@ -43,46 +46,42 @@ export default function App() {
             <button
               key={s.id}
               onClick={() => setSource(s.id)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                source === s.id
-                  ? 'bg-blue-600 text-white shadow'
-                  : 'text-white/40 hover:text-white/70'
+              className={`flex items-center gap-1 px-2 md:px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                source === s.id ? 'bg-blue-600 text-white shadow' : 'text-white/40 hover:text-white/70'
               }`}
             >
               <span>{s.icon}</span>
-              <span>{s.label}</span>
+              <span className="hidden sm:inline">{s.label}</span>
             </button>
           ))}
         </div>
 
         {/* Mode toggle */}
-        <div className="flex items-center gap-1 bg-white/5 rounded-lg p-1 border border-white/8">
+        <div className="flex items-center gap-0.5 bg-white/5 rounded-lg p-1 border border-white/8">
           {[
-            { id: 'calculator', label: 'Calculator', icon: '🧮' },
-            { id: 'reference',  label: 'Reference',  icon: '📋' },
+            { id: 'calculator', label: 'Calc', icon: '🧮' },
+            { id: 'reference',  label: 'Ref',  icon: '📋' },
           ].map(m => (
             <button
               key={m.id}
               onClick={() => setMode(m.id)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                mode === m.id
-                  ? 'bg-indigo-600 text-white shadow'
-                  : 'text-white/40 hover:text-white/70'
+              className={`flex items-center gap-1 px-2 md:px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                mode === m.id ? 'bg-indigo-600 text-white shadow' : 'text-white/40 hover:text-white/70'
               }`}
             >
               <span>{m.icon}</span>
-              <span>{m.label}</span>
+              <span className="hidden sm:inline">{m.label}</span>
             </button>
           ))}
         </div>
       </header>
 
       {/* ── DISCLAIMER ── */}
-      <div className="flex-shrink-0 flex items-center gap-2 px-5 py-1.5 bg-amber-500/6 border-b border-amber-500/12">
+      <div className="flex-shrink-0 flex items-center gap-2 px-3 md:px-5 py-1.5 bg-amber-500/6 border-b border-amber-500/12">
         <span className="text-amber-400 text-[10px]">⚠</span>
-        <p className="text-[10px] text-amber-400/70">For clinical decision support only — always verify doses independently.</p>
-        <div className="ml-auto flex items-center gap-1.5">
-          <span className="text-[9px] text-white/20 font-medium">{source === 'barash' ? '📘 Barash 9e' : "📗 Miller's 9e"}</span>
+        <p className="text-[10px] text-amber-400/70 leading-tight">For clinical decision support only — always verify doses independently.</p>
+        <div className="ml-auto flex-shrink-0">
+          <span className="text-[9px] text-white/20 font-medium hidden sm:inline">{source === 'barash' ? '📘 Barash 9e' : "📗 Miller's 9e"}</span>
         </div>
       </div>
 
@@ -92,13 +91,19 @@ export default function App() {
         {/* ── CALCULATOR MODE ── */}
         {mode === 'calculator' && (
           <>
-            {/* Patient sidebar */}
-            <aside className="w-72 flex-shrink-0 border-r border-white/8 overflow-y-auto" style={{ background: '#0a1322' }}>
+            {/* Desktop: side by side | Mobile: tabs */}
+            <aside className={`
+              flex-shrink-0 border-r border-white/8 overflow-y-auto
+              w-full md:w-72
+              ${mobileTab === 'patient' ? 'block' : 'hidden'} md:block
+            `} style={{ background: '#0a1322' }}>
               <PatientForm patient={patient} onChange={setPatient} onReset={() => setPatient(DEFAULT_PATIENT)} />
             </aside>
 
-            {/* Drug list */}
-            <main className="flex-1 overflow-y-auto px-5 py-5">
+            <main className={`
+              flex-1 overflow-y-auto px-3 md:px-5 py-4 md:py-5
+              ${mobileTab === 'drugs' ? 'block' : 'hidden'} md:block
+            `}>
               <DrugTable patient={patient} drugList={drugList} categoryList={categoryList} />
             </main>
           </>
@@ -106,11 +111,34 @@ export default function App() {
 
         {/* ── REFERENCE MODE ── */}
         {mode === 'reference' && (
-          <main className="flex-1 overflow-y-auto px-5 py-5 max-w-4xl mx-auto w-full">
+          <main className="flex-1 overflow-y-auto px-3 md:px-5 py-4 md:py-5 max-w-4xl mx-auto w-full">
             {source === 'barash' ? <BarashReference /> : <DrugReference />}
           </main>
         )}
       </div>
+
+      {/* ── MOBILE BOTTOM TAB BAR (calculator mode only) ── */}
+      {mode === 'calculator' && (
+        <nav className="md:hidden flex-shrink-0 border-t border-white/8 flex" style={{ background: '#0a1322' }}>
+          {[
+            { id: 'patient', label: 'Patient',  icon: '🧑‍⚕️' },
+            { id: 'drugs',   label: 'Drugs',    icon: '💊' },
+          ].map(t => (
+            <button
+              key={t.id}
+              onClick={() => setMobileTab(t.id)}
+              className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-semibold transition-all ${
+                mobileTab === t.id
+                  ? 'text-blue-400 border-t-2 border-blue-500'
+                  : 'text-white/30 border-t-2 border-transparent'
+              }`}
+            >
+              <span className="text-lg leading-none">{t.icon}</span>
+              <span>{t.label}</span>
+            </button>
+          ))}
+        </nav>
+      )}
     </div>
   );
 }
