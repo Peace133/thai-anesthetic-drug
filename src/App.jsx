@@ -219,14 +219,26 @@ export default function App() {
 }
 
 function FeedbackModal({ onClose }) {
-  const [text, setText] = useState('');
-  const [sent, setSent]   = useState(false);
+  const [text, setText]       = useState('');
+  const [rating, setRating]   = useState(0);
+  const [hover, setHover]     = useState(0);
+  const [status, setStatus]   = useState('idle'); // idle | sending | sent | error
 
-  function handleSend() {
+  async function handleSend() {
     if (!text.trim()) return;
-    window.location.href = `mailto:kunka10839@gmail.com?subject=Feedback%20—%20Anesthetic%20Drug%20Calculator&body=${encodeURIComponent(text)}`;
-    setSent(true);
-    setTimeout(onClose, 1500);
+    setStatus('sending');
+    try {
+      const res = await fetch('/api/feedback', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ message: text, rating: rating || undefined }),
+      });
+      if (!res.ok) throw new Error();
+      setStatus('sent');
+      setTimeout(onClose, 2000);
+    } catch {
+      setStatus('error');
+    }
   }
 
   return (
@@ -234,14 +246,41 @@ function FeedbackModal({ onClose }) {
       <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="fixed inset-x-4 bottom-16 z-50 rounded-2xl border border-white/10 p-4 space-y-3 max-w-sm mx-auto"
         style={{ background: 'var(--bg-card)' }}>
+
+        {/* Header */}
         <div className="flex items-center justify-between">
           <p className="text-sm font-bold text-white">Send Feedback</p>
           <button onClick={onClose} className="text-white/30 hover:text-white/60 transition-colors">✕</button>
         </div>
-        {sent ? (
-          <p className="text-center py-4 text-green-400 text-sm">Opening email… thank you!</p>
+
+        {status === 'sent' ? (
+          <div className="flex flex-col items-center py-6 gap-2">
+            <span className="text-3xl">✅</span>
+            <p className="text-sm font-semibold text-green-400">Feedback sent — thank you!</p>
+          </div>
         ) : (
           <>
+            {/* Star rating */}
+            <div className="flex items-center gap-1">
+              {[1,2,3,4,5].map(n => (
+                <button
+                  key={n}
+                  onMouseEnter={() => setHover(n)}
+                  onMouseLeave={() => setHover(0)}
+                  onClick={() => setRating(n)}
+                  className="text-xl transition-transform hover:scale-110 active:scale-95"
+                >
+                  <span style={{ color: n <= (hover || rating) ? '#f59e0b' : 'rgba(255,255,255,0.15)' }}>★</span>
+                </button>
+              ))}
+              {rating > 0 && (
+                <span className="text-[11px] text-white/30 ml-1">
+                  {['','Poor','Fair','Good','Great','Excellent'][rating]}
+                </span>
+              )}
+            </div>
+
+            {/* Message */}
             <textarea
               autoFocus
               value={text}
@@ -251,13 +290,18 @@ function FeedbackModal({ onClose }) {
               className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white
                          placeholder-white/20 focus:outline-none focus:border-indigo-500/50 transition-all resize-none"
             />
+
+            {status === 'error' && (
+              <p className="text-[11px] text-red-400">Failed to send — please try again.</p>
+            )}
+
             <button
               onClick={handleSend}
-              disabled={!text.trim()}
+              disabled={!text.trim() || status === 'sending'}
               className="w-full py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95
-                         bg-indigo-600 hover:bg-indigo-500 text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                         bg-indigo-600 hover:bg-indigo-500 text-white disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Send via Email
+              {status === 'sending' ? 'Sending…' : 'Send Feedback'}
             </button>
           </>
         )}
