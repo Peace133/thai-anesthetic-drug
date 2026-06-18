@@ -17,7 +17,9 @@ app.post('/api/feedback', async (req, res) => {
 
   try {
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -45,7 +47,7 @@ app.post('/api/feedback', async (req, res) => {
 
     res.json({ ok: true });
   } catch (err) {
-    console.error('Feedback email error:', err.message);
+    console.error('Feedback email error:', err.message, err.code, err.response);
     res.status(500).json({ error: 'Failed to send' });
   }
 });
