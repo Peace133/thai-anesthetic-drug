@@ -18,6 +18,7 @@ export default function App() {
   const [draftResetKey, setDraftResetKey] = useState(0);
   const [calcResetKey, setCalcResetKey]   = useState(0);
   const [isDark, setIsDark]               = useState(true);
+  const [showFeedback, setShowFeedback]   = useState(false);
 
   function handleClear() {
     setPatient(DEFAULT_PATIENT);
@@ -184,13 +185,83 @@ export default function App() {
       </div>
 
       {/* ── FOOTER ── */}
-      <footer className="flex-shrink-0 px-4 py-3 flex items-center justify-center border-t border-white/6"
+      <footer className="flex-shrink-0 px-4 py-3 flex items-center border-t border-white/6"
         style={{ background: 'var(--bg-surface)' }}>
-        <p className="text-[11px] text-white/20">
+        {/* Left — feedback */}
+        <button
+          onClick={() => setShowFeedback(true)}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-white/8 text-[11px] text-white/35
+                     hover:border-indigo-500/40 hover:text-indigo-400 hover:bg-indigo-500/8 transition-all active:scale-95"
+        >
+          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M7 8h10M7 12h6m-6 4h10M5 20l-2 2V4a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5z" />
+          </svg>
+          Feedback
+        </button>
+
+        {/* Center — credit */}
+        <p className="flex-1 text-center text-[11px] text-white/20">
           Made by <span className="text-white/40 font-semibold">Chet43</span> and team
         </p>
+
+        {/* Right — version */}
+        <span className="text-[10px] text-white/15">v1.0.0</span>
       </footer>
 
+      {/* ── FEEDBACK MODAL ── */}
+      {showFeedback && (
+        <FeedbackModal onClose={() => setShowFeedback(false)} />
+      )}
+
     </div>
+  );
+}
+
+function FeedbackModal({ onClose }) {
+  const [text, setText] = useState('');
+  const [sent, setSent]   = useState(false);
+
+  function handleSend() {
+    if (!text.trim()) return;
+    window.location.href = `mailto:kunka10839@gmail.com?subject=Feedback%20—%20Anesthetic%20Drug%20Calculator&body=${encodeURIComponent(text)}`;
+    setSent(true);
+    setTimeout(onClose, 1500);
+  }
+
+  return (
+    <>
+      <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed inset-x-4 bottom-16 z-50 rounded-2xl border border-white/10 p-4 space-y-3 max-w-sm mx-auto"
+        style={{ background: 'var(--bg-card)' }}>
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-bold text-white">Send Feedback</p>
+          <button onClick={onClose} className="text-white/30 hover:text-white/60 transition-colors">✕</button>
+        </div>
+        {sent ? (
+          <p className="text-center py-4 text-green-400 text-sm">Opening email… thank you!</p>
+        ) : (
+          <>
+            <textarea
+              autoFocus
+              value={text}
+              onChange={e => setText(e.target.value)}
+              placeholder="Tell us what you think or report an issue…"
+              rows={4}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white
+                         placeholder-white/20 focus:outline-none focus:border-indigo-500/50 transition-all resize-none"
+            />
+            <button
+              onClick={handleSend}
+              disabled={!text.trim()}
+              className="w-full py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95
+                         bg-indigo-600 hover:bg-indigo-500 text-white disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              Send via Email
+            </button>
+          </>
+        )}
+      </div>
+    </>
   );
 }
