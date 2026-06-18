@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PatientForm from './components/PatientForm.jsx';
 import DrugTable from './components/DrugTable.jsx';
 import DrugReference from './components/DrugReference.jsx';
@@ -20,17 +20,6 @@ export default function App() {
   const [isDark, setIsDark]               = useState(true);
   const [showFeedback, setShowFeedback]   = useState(false);
 
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://storage.ko-fi.com/cdn/widget/Widget_2.js';
-    script.type = 'text/javascript';
-    script.onload = () => {
-      window.kofiwidget2.init('Support me on Ko-fi', '#72a4f2', 'Z8R721MY8A');
-      window.kofiwidget2.draw();
-    };
-    document.body.appendChild(script);
-    return () => { document.body.removeChild(script); };
-  }, []);
 
   function handleClear() {
     setPatient(DEFAULT_PATIENT);
@@ -213,18 +202,25 @@ export default function App() {
             Feedback
           </button>
 
-<button
+          <a
+            href="https://ko-fi.com/Z8R721MY8A"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-white
+                       transition-all active:scale-95 hover:opacity-85"
+            style={{ background: '#72a4f2' }}
+          >
+            ☕ Ko-fi
+          </a>
+
+          <button
             disabled
             title="Coming soon"
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-white/5 text-[11px]
-                       text-white/15 cursor-not-allowed relative"
+                       text-white/15 cursor-not-allowed"
           >
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M12 4v1m0 14v1m8-8h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707" />
-            </svg>
             PromptPay
-            <span className="text-[8px] font-bold px-1 py-0.5 rounded bg-white/8 text-white/20 leading-none">Soon</span>
+            <span className="text-[8px] font-bold px-1 py-0.5 rounded bg-white/8 text-white/20 leading-none ml-1">Soon</span>
           </button>
         </div>
 
