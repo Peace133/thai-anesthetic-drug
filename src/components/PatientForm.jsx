@@ -1,21 +1,23 @@
+import { useState } from 'react';
 import { calcBMI, calcIBW, calcLBW, bmiClass } from '../utils.js';
 
 const COMORBIDITIES = [
-  { id: 'cardiac',      label: 'Cardiac Disease',    icon: '❤️' },
-  { id: 'hypovolemia',  label: 'Hypovolemia/Shock',  icon: '💧' },
-  { id: 'renal',        label: 'Renal Failure',      icon: '🫘' },
-  { id: 'hepatic',      label: 'Hepatic Failure',    icon: '🟡' },
-  { id: 'copd',         label: 'COPD',               icon: '🌬️' },
-  { id: 'dm',           label: 'Diabetes',           icon: '🩸' },
-  { id: 'raised_icp',   label: 'Raised ICP',         icon: '🧠' },
+  { id: 'cardiac',      label: 'Cardiac Disease',        icon: '❤️' },
+  { id: 'hypovolemia',  label: 'Hypovolemia / Shock',    icon: '💧' },
+  { id: 'renal',        label: 'Renal Failure',          icon: '🫘' },
+  { id: 'hepatic',      label: 'Hepatic Failure',        icon: '🟡' },
+  { id: 'copd',         label: 'COPD',                   icon: '🌬️' },
+  { id: 'dm',           label: 'Diabetes',               icon: '🩸' },
+  { id: 'raised_icp',   label: 'Raised ICP',             icon: '🧠' },
   { id: 'mh',           label: 'Malignant Hyperthermia', icon: '🔥' },
-  { id: 'burns',        label: 'Burns / Crush',      icon: '🩹' },
-  { id: 'dmd',          label: 'Neuromuscular Dz',   icon: '💪' },
-  { id: 'hyperkalemia', label: 'Hyperkalemia',       icon: '⚡' },
-  { id: 'porphyria',    label: 'Porphyria',          icon: '🧬' },
+  { id: 'burns',        label: 'Burns / Crush',          icon: '🩹' },
+  { id: 'dmd',          label: 'Neuromuscular Dz',       icon: '💪' },
+  { id: 'hyperkalemia', label: 'Hyperkalemia',           icon: '⚡' },
+  { id: 'porphyria',    label: 'Porphyria',              icon: '🧬' },
 ];
 
-export default function PatientForm({ patient, onChange, onReset }) {
+export default function PatientForm({ patient, onChange, onReset, hideComorbidities = false }) {
+  const [showComorbidities, setShowComorbidities] = useState(false);
   const { weightKg, heightCm, age, sex, comorbidities } = patient;
   const ready = weightKg > 0 && heightCm > 0 && age > 0;
 
@@ -36,27 +38,28 @@ export default function PatientForm({ patient, onChange, onReset }) {
   }
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Sidebar header */}
-      <div className="px-4 pt-4 pb-3 border-b border-white/8 flex items-center justify-between flex-shrink-0">
+    <div className="rounded-2xl border border-white/8 overflow-hidden" style={{ background: 'var(--bg-card)' }}>
+
+      {/* Card header */}
+      <div className="px-4 py-3 border-b border-white/8 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-1 h-4 bg-blue-500 rounded-full" />
-          <span className="text-xs font-bold text-white/70 uppercase tracking-widest">Patient</span>
+          <span className="text-xs font-bold text-white/60 uppercase tracking-widest">Patient Information</span>
         </div>
         {ready && (
           <button
             onClick={onReset}
-            className="text-[10px] text-white/25 hover:text-white/50 transition-colors px-2 py-0.5 rounded"
+            className="text-xs font-semibold text-red-400 hover:text-red-300 transition-all px-3 py-1 rounded-lg border border-red-500/40 hover:border-red-400/60 hover:bg-red-500/10 active:scale-95"
           >
             Clear
           </button>
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="p-4 space-y-4">
 
-        {/* Basic inputs — 2-column grid */}
-        <div className="grid grid-cols-2 gap-2.5">
+        {/* ── Input grid: 2-col mobile, 4-col desktop ── */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <Field label="Weight (kg)">
             <input
               type="number" min="1" max="300"
@@ -75,7 +78,7 @@ export default function PatientForm({ patient, onChange, onReset }) {
               placeholder="170"
             />
           </Field>
-          <Field label="Age">
+          <Field label="Age (yrs)">
             <input
               type="number" min="0" max="120"
               value={age || ''}
@@ -96,65 +99,81 @@ export default function PatientForm({ patient, onChange, onReset }) {
           </Field>
         </div>
 
-        {/* Status — either prompt or stats */}
+        {/* ── Calculated stats ── */}
         {!ready ? (
-          <div className="rounded-xl border border-blue-500/15 bg-blue-500/5 px-3 py-2.5">
-            <p className="text-[11px] text-blue-400/60 text-center">Enter weight, height &amp; age to calculate doses</p>
+          <div className="rounded-xl border border-blue-500/12 bg-blue-500/4 px-3 py-2.5 text-center">
+            <p className="text-[11px] text-blue-400/50">Enter weight, height and age to calculate doses</p>
           </div>
         ) : (
-          <>
-            {/* Calculated weights */}
-            <div className="grid grid-cols-3 gap-1.5">
-              <StatBox label="BMI" value={bmi.toFixed(1)}>
-                <span className="text-[10px] font-bold mt-0.5" style={{ color: bc.color }}>{bc.label}</span>
-              </StatBox>
-              <StatBox label="IBW" value={`${ibw.toFixed(0)} kg`} />
-              <StatBox label="LBW" value={`${lbw.toFixed(0)} kg`} />
-            </div>
-
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+            <StatBox label="BMI" value={bmi.toFixed(1)}>
+              <span className="text-[9px] font-bold" style={{ color: bc.color }}>{bc.label}</span>
+            </StatBox>
+            <StatBox label="IBW" value={`${ibw.toFixed(0)} kg`} />
+            <StatBox label="LBW" value={`${lbw.toFixed(0)} kg`} />
             {/* Flags */}
-            <div className="flex flex-wrap gap-1">
+            <div className="col-span-3 md:col-span-3 flex flex-wrap items-center gap-1.5 self-center">
               {age >= 65 && <Flag text="Elderly ≥65" color="#f97316" />}
-              {bmi >= 40 && <Flag text="Morbid Obese" color="#ef4444" />}
-              {bmi >= 30 && bmi < 40 && <Flag text={`Obese BMI ${bmi.toFixed(0)}`} color="#f97316" />}
+              {bmi >= 40  && <Flag text="Morbid Obese" color="#ef4444" />}
+              {bmi >= 30  && bmi < 40 && <Flag text={`Obese BMI ${bmi.toFixed(0)}`} color="#f97316" />}
               {bmi < 18.5 && <Flag text="Underweight" color="#60a5fa" />}
+              {comorbidities.length > 0 && (
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                  style={{ background: '#ef444422', color: '#ef4444' }}>
+                  ⚠ {comorbidities.length} comorbidities
+                </span>
+              )}
             </div>
-          </>
+          </div>
         )}
 
-        {/* Comorbidities */}
-        <div>
-          <div className="flex items-center gap-1.5 mb-2">
-            <p className="text-[10px] font-bold text-white/30 uppercase tracking-wider">Comorbidities</p>
-            {comorbidities.length > 0 && (
-              <span className="text-[10px] bg-red-500/20 text-red-400 rounded-full px-1.5 py-0.5 font-bold">
-                {comorbidities.length}
-              </span>
+        {/* ── Comorbidities toggle ── */}
+        {!hideComorbidities && (
+          <div>
+            <button
+              onClick={() => setShowComorbidities(v => !v)}
+              className="w-full flex items-center justify-between px-3 py-2 rounded-xl border border-white/8 bg-white/3 hover:bg-white/5 transition-all"
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold text-white/40 uppercase tracking-wider">Comorbidities</span>
+                {comorbidities.length > 0 && (
+                  <span className="text-[10px] bg-red-500/20 text-red-400 rounded-full px-1.5 py-0.5 font-bold">
+                    {comorbidities.length} active
+                  </span>
+                )}
+              </div>
+              <svg
+                className={`w-4 h-4 text-white/25 transition-transform ${showComorbidities ? 'rotate-180' : ''}`}
+                fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {showComorbidities && (
+              <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-1">
+                {COMORBIDITIES.map(c => {
+                  const active = comorbidities.includes(c.id);
+                  return (
+                    <button
+                      key={c.id}
+                      onClick={() => toggleComorbidity(c.id)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-xl text-left transition-all border ${
+                        active
+                          ? 'bg-red-500/12 border-red-500/35 text-red-300'
+                          : 'bg-white/3 border-white/6 text-white/40 hover:bg-white/6 hover:text-white/60'
+                      }`}
+                    >
+                      <span className="text-xs flex-shrink-0">{c.icon}</span>
+                      <span className="text-[11px] font-medium flex-1">{c.label}</span>
+                      {active && <span className="text-[10px] text-red-400 font-bold">✓</span>}
+                    </button>
+                  );
+                })}
+              </div>
             )}
           </div>
-          <div className="grid grid-cols-1 gap-1">
-            {COMORBIDITIES.map(c => {
-              const active = comorbidities.includes(c.id);
-              return (
-                <button
-                  key={c.id}
-                  onClick={() => toggleComorbidity(c.id)}
-                  className={`flex items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-all border ${
-                    active
-                      ? 'bg-red-500/15 border-red-500/40 text-red-300'
-                      : 'bg-white/3 border-white/6 text-white/45 hover:bg-white/6 hover:text-white/65'
-                  }`}
-                >
-                  <span className="text-[12px] flex-shrink-0">{c.icon}</span>
-                  <span className="text-[11px] font-medium">{c.label}</span>
-                  {active && (
-                    <span className="ml-auto text-[10px] text-red-400 font-bold">✓</span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        )}
 
       </div>
     </div>
@@ -172,8 +191,8 @@ function Field({ label, children }) {
 
 function StatBox({ label, value, children }) {
   return (
-    <div className="rounded-lg p-2.5 flex flex-col" style={{ background: 'rgba(255,255,255,0.04)' }}>
-      <p className="text-[9px] text-white/35 uppercase tracking-wider font-bold">{label}</p>
+    <div className="rounded-xl p-2.5 flex flex-col" style={{ background: 'rgba(255,255,255,0.04)' }}>
+      <p className="text-[9px] text-white/30 uppercase tracking-wider font-bold">{label}</p>
       <p className="text-sm font-bold text-white mt-0.5">{value}</p>
       {children}
     </div>
@@ -182,7 +201,8 @@ function StatBox({ label, value, children }) {
 
 function Flag({ text, color }) {
   return (
-    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold" style={{ background: color + '22', color }}>
+    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold"
+      style={{ background: color + '22', color }}>
       ⚠ {text}
     </span>
   );
