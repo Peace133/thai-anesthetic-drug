@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PatientForm from './components/PatientForm.jsx';
 import DrugTable from './components/DrugTable.jsx';
 import DrugReference from './components/DrugReference.jsx';
@@ -19,6 +19,18 @@ export default function App() {
   const [calcResetKey, setCalcResetKey]   = useState(0);
   const [isDark, setIsDark]               = useState(true);
   const [showFeedback, setShowFeedback]   = useState(false);
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://storage.ko-fi.com/cdn/widget/Widget_2.js';
+    script.type = 'text/javascript';
+    script.onload = () => {
+      window.kofiwidget2.init('Support me on Ko-fi', '#72a4f2', 'Z8R721MY8A');
+      window.kofiwidget2.draw();
+    };
+    document.body.appendChild(script);
+    return () => { document.body.removeChild(script); };
+  }, []);
 
   function handleClear() {
     setPatient(DEFAULT_PATIENT);
@@ -201,20 +213,7 @@ export default function App() {
             Feedback
           </button>
 
-          <a
-            href="https://ko-fi.com/chettapol"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-white/8 text-[11px] text-white/35
-                       hover:border-amber-500/40 hover:text-amber-400 hover:bg-amber-500/8 transition-all active:scale-95"
-          >
-            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-            </svg>
-            Ko-fi
-          </a>
-
-          <button
+<button
             disabled
             title="Coming soon"
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-white/5 text-[11px]
